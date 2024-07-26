@@ -18,8 +18,21 @@ function Form() {
 
 
   const handlesubmit = async (e) => {
+
     e.preventDefault();
-    console.log(name, numbers, email, stateName, cityName, message);
+    checkemailformat(email)   
+
+    if(checkemailformat(email))
+   { 
+    alert("Please wait for success of submission")
+    let btn = document.querySelector('.submitBtn')
+    console.log(btn)
+    btn.style.cursor = 'none'
+    btn.style.backgroundColor = 'white'
+    btn.style.color = 'black'
+    btn.disabled = true;
+
+    //  THIS IS EMAIL CONTENT---------
 
     const serviceId = "service_1lxhoab";
     const templateId = "template_b9xwplr"
@@ -30,7 +43,11 @@ function Form() {
       from_email: email,
       to_name: 'aditya kamodiya',
       message: message,
+      Uploader_State: stateName,
+      Uploader_City: cityName,
+      Uploader_Mo_no: numbers,
     };
+
 
     // emailjs.send(serviceId, templateId, templateParams, publicKey)
     //   .then(
@@ -39,11 +56,14 @@ function Form() {
     //       // setname('');
     //       // setemail('');
     //       // setmessage('');
-    //       window.location.reload();
+    //       // window.location.reload();
     //     })
     //   .catch((error) => {
     //     console.log('FAILED...', error);
     //   });
+
+   
+
 
 
     //  THIS IS DATA UPLOADING CONTENTS--------------
@@ -63,12 +83,13 @@ function Form() {
     // formData.append('Message', cityName);
 
     try {
-      const response = await axios.post('https://file-uploader-back.onrender.com/upload ', formData, {
+      const response = await axios.post('https://file-uploader-back.onrender.com', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
       console.log('File uploaded successfully:', response.data);
+
       alert("submitted successfully!!!")
       window.location.reload();
 
@@ -76,7 +97,7 @@ function Form() {
     catch (error) {
       console.error('Error uploading file:', error);
     }
-
+   } 
   }
 
   // THIS USeEFFECT IS FOR CALLING THE STATES FUNCTION---------
@@ -147,19 +168,54 @@ function Form() {
     AllCities(code);
   };
 
+  // THIS FUNCTION IS USED TO CHECK THE FILE EXTENSION LIKE .PDF, .DOCX, .JGG ETC -----. 
+  function  CheckFileFormat(e) {
+    let format = e.target.files[0].name.slice(e.target.files[0].name.lastIndexOf('.') + 1, e.
+      target.files[0].name.length);
+
+    // console.log(format)
+
+    if (format == 'pptx' || format == 'ppt'|| format == 'docx') {
+      alert('change your file fromat( ex : pdf etc. )')
+    }
+    else
+      {
+        setfile(e.target.files[0]) 
+        // console.log(e.target.files[0]);
+      }
+
+  }
+
+  function checkemailformat(emailformat){
+    let regex = /^[a-z][a-z0-9]{3,}[@][a-z]+[.][a-z]+$/;
+   if(regex.test(emailformat))
+   {
+    return true;
+   }
+   else{
+     alert("please enter correct email !!");
+     let emailinput = document.querySelector('#email');
+     emailinput.value = ''
+     
+   }
+ }
+    
+  
   return (
     <>
       <div id="wrapper">
         <form action="" onSubmit={handlesubmit}>
-          <h1>Ek Form jo Bhej De Apka Data</h1>
-          <input required type="text" placeholder='name' value={name} onChange={(e) => { setname(e.target.value) }} />
-          <input required type="number" name="" id="" placeholder='write your numbers' onChange={(e) => { setnumbers(e.target.value) }} />
+          <h1><span>Ek Form jo Bhej</span> De Apka Data</h1>
 
-          <input required type="email" placeholder='your email' value={email} onChange={(e) => setemail(e.target.value)} />
+          <input required type="text" placeholder='Name' value={name} onChange={(e) => { setname(e.target.value) }} />
+
+          <input required type="number" name="" id="" placeholder='Phone numbers' onChange={(e) => { setnumbers(e.target.value) }} />
+
+          <input required type="email" placeholder='Email' value={email} onChange={(e) => setemail(e.target.value)} />
 
 
-          <select  onChange={handleStateChange} className='states'>
-            <option selected disabled>select state</option>
+          <select required onChange={handleStateChange} className='states'>
+            <option selected disabled>Select State</option>
             {
               states.map((result, index) => (
                 <option key={index} value={result.iso2}>{result.name}</option>
@@ -167,19 +223,20 @@ function Form() {
             }
           </select>
 
-          <select  onChange={e => { setcityName(e.target.value) }} className='cities'   >
-            <option selected disabled>select city</option>
+          <select required onChange={e => { setcityName(e.target.value) }} className='cities'   >
+            <option selected disabled>Select City</option>
             {
               cities.map((result) => {
                 return <option value={result.name}>{result.name}</option>
               })
             }
           </select>
+
           <textarea required rows='10' cols='20' placeholder='message' value={message} onChange={(e) => setmessage(e.target.value)}></textarea>
 
-          <input required className='file' type="file" onChange={(e) => { setfile(e.target.files[0]) }} />
+          <input required className='file' type="file" onChange={(e) => { CheckFileFormat(e) }} />
 
-          <button type='submit'> submit</button>
+          <button type='submit' className='submitBtn'> Submit</button>
 
         </form>
       </div>
